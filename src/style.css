@@ -11,3 +11,12 @@ padding:0!important;
 size:A4 landscape;
 margin:0;
 }
+
+
+.signs img{
+background:transparent!important;
+mix-blend-mode:multiply!important;
+filter:contrast(2) brightness(.65)!important;
+padding:0!important;
+box-shadow:none!important;
+}

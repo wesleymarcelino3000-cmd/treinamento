@@ -11,6 +11,31 @@ pdfjsLib.GlobalWorkerOptions.workerSrc=pdfWorker;
 const supabase=createClient(import.meta.env.VITE_SUPABASE_URL,import.meta.env.VITE_SUPABASE_ANON_KEY);
 const BUCKET="ppts";
 const today=()=>new Date().toISOString().slice(0,10);
+
+function removeSignatureBackground(dataUrl){
+return new Promise((resolve)=>{
+const img=new Image();
+img.onload=()=>{
+const c=document.createElement("canvas");
+c.width=img.width;
+c.height=img.height;
+const ctx=c.getContext("2d");
+ctx.drawImage(img,0,0);
+const image=ctx.getImageData(0,0,c.width,c.height);
+const d=image.data;
+for(let i=0;i<d.length;i+=4){
+const r=d[i],g=d[i+1],b=d[i+2];
+if(r>175&&g>175&&b>175){
+d[i+3]=0;
+}
+}
+ctx.putImageData(image,0,0);
+resolve(c.toDataURL("image/png"));
+};
+img.src=dataUrl;
+});
+}
+
 const br=d=>d?new Date(d).toLocaleDateString("pt-BR"):"—";
 const mb=s=>s?`${(s/1024/1024).toFixed(1)} MB`:"—";
 const kind=n=>(n||"").toLowerCase().endsWith(".pptx")?"PPTX":"PPT";
@@ -35,7 +60,14 @@ function openCert(i){setCert(i);setForm({curso:i.nome||"",instrutor:i.responsave
 function addP(){setForm(f=>({...f,participantes:[...f.participantes,{nome:"",assinatura:""}]}))}
 function upP(idx,field,val){setForm(f=>({...f,participantes:f.participantes.map((p,i)=>i===idx?{...p,[field]:val}:p)}))}
 function rmP(idx){setForm(f=>({...f,participantes:f.participantes.filter((_,i)=>i!==idx)}))}
-async function importPdf(file){if(!file)return;setImporting(true);setMsg("Importando PDF e lendo nomes/assinaturas...");try{const{canvas,text}=await pdfPage(file);const parsed=parseText(text);let parts=parsed.names.map((nome,i)=>({nome,assinatura:crop(canvas,.39,.398+i*.11,.52,.095)}));if(!parts.length){for(let i=0;i<10;i++){const nameImg=crop(canvas,.13,.398+i*.11,.24,.095);const r=await recognize(nameImg,"por");const nome=clean(r?.data?.text);if(nome&&nome.length>3)parts.push({nome,assinatura:crop(canvas,.39,.398+i*.11,.52,.095)})}}setForm(f=>({...f,curso:parsed.curso||f.curso,instrutor:parsed.instrutor||f.instrutor,data:parsed.data?parsed.data.split("/").reverse().join("-"):f.data,local:parsed.local||f.local,participantes:parts}));setMsg(parts.length?`${parts.length} participante(s) importado(s). Revise antes de imprimir.`:"Não consegui ler nomes automaticamente. Adicione manualmente.")}catch(e){setMsg("Erro ao importar PDF: "+(e?.message||e))}setImporting(false);pdfInput.current&&(pdfInput.current.value="")}
+async function importPdf(file){if(!file)return;setImporting(true);setMsg("Importando PDF e lendo nomes/assinaturas...");try{const{canvas,text}=await pdfPage(file);const parsed=parseText(text);let parts=[];
+for(let i=0;i<parsed.names.length;i++){
+const assinaturaOriginal=crop(canvas,.39,.398+i*.11,.52,.095);
+const assinatura=await removeSignatureBackground(assinaturaOriginal);
+parts.push({nome:parsed.names[i],assinatura});
+}if(!parts.length){for(let i=0;i<10;i++){const nameImg=crop(canvas,.13,.398+i*.11,.24,.095);const r=await recognize(nameImg,"por");const nome=clean(r?.data?.text);if(nome&&nome.length>3)const assinaturaOriginal=crop(canvas,.39,.398+i*.11,.52,.095);
+const assinatura=await removeSignatureBackground(assinaturaOriginal);
+parts.push({nome,assinatura})}}setForm(f=>({...f,curso:parsed.curso||f.curso,instrutor:parsed.instrutor||f.instrutor,data:parsed.data?parsed.data.split("/").reverse().join("-"):f.data,local:parsed.local||f.local,participantes:parts}));setMsg(parts.length?`${parts.length} participante(s) importado(s). Revise antes de imprimir.`:"Não consegui ler nomes automaticamente. Adicione manualmente.")}catch(e){setMsg("Erro ao importar PDF: "+(e?.message||e))}setImporting(false);pdfInput.current&&(pdfInput.current.value="")}
 const certParts=form.participantes.length?form.participantes:[{nome:"Nome do Participante",assinatura:""}];
 return <div className="app">
 <aside className={menu?"side open":"side"}><div className="brand"><div className="logo">P</div><div><b>PPT SaaS</b><span>Certificados Premium</span></div></div><button className="active">Dashboard</button><button onClick={()=>input.current.click()}><Upload/> Upload múltiplo</button><button onClick={()=>setFilter("aplicados")}><CheckCircle2/> Aplicados</button><button onClick={()=>setFilter("nao")}><Clock3/> Não aplicados</button><div className="cardMini"><Award/><b>Certificados A4</b><p>Importe PDF da presença e gere um certificado por participante.</p></div></aside>
