@@ -1,0 +1,25 @@
+
+MELHORIAS IMPLEMENTADAS:
+
+1. Certificados muito mais premium
+- Moldura refinada
+- Selo dourado
+- Tipografia mais elegante
+- Layout corporativo profissional
+
+2. Download PDF
+- Impressão configurada para salvar PDF corretamente
+- A4 Landscape real
+
+3. Assinaturas transparentes
+- Removido fundo branco das assinaturas
+- Aparência de assinatura digital real
+
+4. A4 correto
+- @page configurado em A4 landscape
+- Escala correta
+
+5. Abrir PPT em modo apresentação
+- Agora abre usando:
+https://view.officeapps.live.com/op/view.aspx?src=
+- Office entra em modo apresentação melhorado
