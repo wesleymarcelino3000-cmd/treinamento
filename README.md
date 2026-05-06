@@ -1,57 +1,22 @@
-# PPT SaaS Premium - Upgrades
+# PPT SaaS com Certificados em Lote
 
-Versão com:
-- Observações avançadas
-- Data da aplicação
-- Responsável pela aplicação
-- Upload múltiplo
-- Drag and drop premium
-- Preview do PPT
-- Miniaturas
-- PWA instalável
-- Ícone profissional
-- Animações premium
-- Sidebar avançada
-- Splash screen
-- Ícone premium
+Inclui:
+- Abrir PPT/PPTX direto dentro do app via Office Online Viewer
+- Certificado premium em A4 paisagem
+- Importação de lista de presença em PDF
+- Leitura de nomes e recorte das assinaturas quando o layout for compatível
+- Geração de um certificado por participante
+- Nome do curso editável
+- Logo Inno Life no certificado
+
+## Importante
+A importação automática depende do layout do PDF. Se algum nome não sair perfeito, revise na tela antes de imprimir.
 
 ## Supabase
-
-1. Crie um bucket chamado exatamente:
-
-`ppts`
-
-2. Marque como Public bucket.
-
-3. Execute o arquivo:
-
-`supabase.sql`
+1. Crie bucket público `ppts`
+2. Execute `supabase.sql`
 
 ## Vercel
-
-Framework: Vite  
-Build command: `npm run build`  
-Output directory: `dist`
-
-Variáveis:
-
-`VITE_SUPABASE_URL=https://cfnvqcsebkrlfqhkenzi.supabase.co`
-
-`VITE_SUPABASE_ANON_KEY=sb_publishable_oaUNkE72fME-_GtTs6DCEA_YrnBFozy`
-
-## Local
-
-```bash
-npm install
-npm run dev
-```
-
-
-## Certificados
-Inclui geração de certificado com logo Inno Life.
-
-Como usar:
-1. Marque o treinamento como Aplicado.
-2. Clique no ícone de medalha/certificado.
-3. Preencha participante, carga horária, local e observações.
-4. Clique em Baixar / imprimir certificado.
+Framework: Vite
+Build: npm run build
+Output: dist
