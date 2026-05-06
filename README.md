@@ -45,3 +45,13 @@ Variáveis:
 npm install
 npm run dev
 ```
+
+
+## Certificados
+Inclui geração de certificado com logo Inno Life.
+
+Como usar:
+1. Marque o treinamento como Aplicado.
+2. Clique no ícone de medalha/certificado.
+3. Preencha participante, carga horária, local e observações.
+4. Clique em Baixar / imprimir certificado.

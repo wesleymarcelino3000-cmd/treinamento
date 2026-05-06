@@ -34,3 +34,10 @@ create policy "ppt_storage_select" on storage.objects for select to anon, authen
 create policy "ppt_storage_insert" on storage.objects for insert to anon, authenticated with check (bucket_id = 'ppts');
 create policy "ppt_storage_update" on storage.objects for update to anon, authenticated using (bucket_id = 'ppts') with check (bucket_id = 'ppts');
 create policy "ppt_storage_delete" on storage.objects for delete to anon, authenticated using (bucket_id = 'ppts');
+
+-- Migração para certificados e campos avançados
+alter table public.ppts add column if not exists data_aplicacao date;
+alter table public.ppts add column if not exists responsavel text default '';
+alter table public.ppts add column if not exists observacao text default '';
+alter table public.ppts add column if not exists tamanho bigint;
+alter table public.ppts add column if not exists caminho text;
