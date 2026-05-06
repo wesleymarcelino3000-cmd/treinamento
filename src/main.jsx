@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import {
   Upload, FileText, CheckCircle2, Clock3, Search, Trash2, Download,
   Eye, X, UserRound, CalendarDays, NotebookPen, LayoutDashboard, Star,
-  FolderOpen, Smartphone, Sparkles, Menu, ChevronRight, Image as ImageIcon
+  FolderOpen, Smartphone, Sparkles, Menu, ChevronRight, Image as ImageIcon, Award, Printer
 } from 'lucide-react'
 import './style.css'
 
@@ -42,6 +42,8 @@ function App() {
   const [message, setMessage] = useState('')
   const [uploading, setUploading] = useState(false)
   const [preview, setPreview] = useState(null)
+  const [certificado, setCertificado] = useState(null)
+  const [certForm, setCertForm] = useState({ participante: '', cargaHoraria: '1 hora', local: 'Inno Life Nutrition', observacoes: '' })
   const [mobileMenu, setMobileMenu] = useState(false)
 
   async function load() {
@@ -158,6 +160,20 @@ function App() {
     else load()
   }
 
+  function openCertificado(item) {
+    setCertificado(item)
+    setCertForm({
+      participante: '',
+      cargaHoraria: '1 hora',
+      local: 'Inno Life Nutrition',
+      observacoes: item.observacao || ''
+    })
+  }
+
+  function imprimirCertificado() {
+    window.print()
+  }
+
   function onDrop(e) {
     e.preventDefault()
     setDragging(false)
@@ -168,7 +184,7 @@ function App() {
     <div className="app">
       <aside className={mobileMenu ? 'sidebar open' : 'sidebar'}>
         <div className="brand">
-          <div className="brandIcon">P</div>
+          <div className="brandIcon image"><img src="/icons/icon-premium.png" alt="Ícone PPT SaaS" /></div>
           <div>
             <strong>PPT SaaS</strong>
             <span>Premium Control</span>
@@ -288,6 +304,7 @@ function App() {
 
                 <div className="actions">
                   <button title="Preview" onClick={() => setPreview(item)}><Eye size={18}/></button>
+                  <button title="Gerar certificado" className="certBtn" onClick={() => openCertificado(item)}><Award size={18}/></button>
                   <a title="Baixar" href={item.url} target="_blank" rel="noreferrer"><Download size={18}/></a>
                   <button title="Excluir" className="danger" onClick={() => removeItem(item)}><Trash2 size={18}/></button>
                 </div>
@@ -296,6 +313,63 @@ function App() {
           </div>
         </section>
       </main>
+
+
+      {certificado && (
+        <div className="modal certificateModal" onClick={() => setCertificado(null)}>
+          <div className="certWrap" onClick={e => e.stopPropagation()}>
+            <button className="close noPrint" onClick={() => setCertificado(null)}><X/></button>
+
+            <div className="certForm noPrint">
+              <h2>Gerar certificado</h2>
+              <div className="formGrid">
+                <label>Nome do participante
+                  <input value={certForm.participante} onChange={e => setCertForm({...certForm, participante: e.target.value})} placeholder="Ex.: João Silva" />
+                </label>
+                <label>Carga horária
+                  <input value={certForm.cargaHoraria} onChange={e => setCertForm({...certForm, cargaHoraria: e.target.value})} placeholder="Ex.: 2 horas" />
+                </label>
+                <label>Local
+                  <input value={certForm.local} onChange={e => setCertForm({...certForm, local: e.target.value})} placeholder="Ex.: Inno Life Nutrition" />
+                </label>
+                <label>Observações
+                  <input value={certForm.observacoes} onChange={e => setCertForm({...certForm, observacoes: e.target.value})} placeholder="Opcional" />
+                </label>
+              </div>
+              <button className="primary" onClick={imprimirCertificado}><Printer size={18}/> Baixar / imprimir certificado</button>
+            </div>
+
+            <section className="certificate">
+              <div className="certBorder">
+                <img className="certLogo" src="/logo-inno-life.webp" alt="Inno Life" />
+                <div className="certSeal"><Award size={54}/></div>
+                <p className="certSmall">Certificado de Conclusão</p>
+                <h1>CERTIFICADO</h1>
+                <p className="certText">Certificamos que</p>
+                <h2>{certForm.participante || 'Nome do Participante'}</h2>
+                <p className="certText">concluiu com êxito o treinamento</p>
+                <h3>{certificado.nome}</h3>
+
+                <div className="certInfo">
+                  <span><b>Data:</b> {formatDate(certificado.data_aplicacao) !== '—' ? formatDate(certificado.data_aplicacao) : formatDate(new Date())}</span>
+                  <span><b>Carga horária:</b> {certForm.cargaHoraria || '—'}</span>
+                  <span><b>Responsável:</b> {certificado.responsavel || '—'}</span>
+                  <span><b>Local:</b> {certForm.local || '—'}</span>
+                </div>
+
+                {certForm.observacoes && <p className="certObs">{certForm.observacoes}</p>}
+
+                <div className="signatures">
+                  <div><span></span><p>Responsável / Instrutor</p></div>
+                  <div><span></span><p>Participante</p></div>
+                </div>
+
+                <p className="certFooter">Inno Life Nutrition • Certificado gerado automaticamente pelo PPT SaaS Premium</p>
+              </div>
+            </section>
+          </div>
+        </div>
+      )}
 
       {preview && (
         <div className="modal" onClick={() => setPreview(null)}>
