@@ -12,28 +12,78 @@ const supabase=createClient(import.meta.env.VITE_SUPABASE_URL,import.meta.env.VI
 const BUCKET="ppts";
 const today=()=>new Date().toISOString().slice(0,10);
 
-function removeSignatureBackground(dataUrl){
-return new Promise((resolve)=>{
-const img=new Image();
-img.onload=()=>{
-const c=document.createElement("canvas");
-c.width=img.width;
-c.height=img.height;
-const ctx=c.getContext("2d");
-ctx.drawImage(img,0,0);
-const image=ctx.getImageData(0,0,c.width,c.height);
-const d=image.data;
-for(let i=0;i<d.length;i+=4){
-const r=d[i],g=d[i+1],b=d[i+2];
-if(r>175&&g>175&&b>175){
-d[i+3]=0;
-}
-}
-ctx.putImageData(image,0,0);
-resolve(c.toDataURL("image/png"));
-};
-img.src=dataUrl;
-});
+
+
+function makeSignatureTransparent(dataUrl){
+  return new Promise((resolve)=>{
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.width;
+      c.height = img.height;
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(img,0,0);
+
+      const image = ctx.getImageData(0,0,c.width,c.height);
+      const d = image.data;
+
+      // Detecta a cor média do fundo pelas bordas do recorte
+      let sr=0, sg=0, sb=0, count=0;
+      const sample = (x,y)=>{
+        const i=(y*c.width+x)*4;
+        sr+=d[i]; sg+=d[i+1]; sb+=d[i+2]; count++;
+      };
+      for(let x=0;x<c.width;x+=4){ sample(x,0); sample(x,c.height-1); }
+      for(let y=0;y<c.height;y+=4){ sample(0,y); sample(c.width-1,y); }
+      const br=sr/count, bg=sg/count, bb=sb/count;
+
+      for(let i=0;i<d.length;i+=4){
+        const r=d[i], g=d[i+1], b=d[i+2];
+
+        const distBg = Math.sqrt((r-br)**2 + (g-bg)**2 + (b-bb)**2);
+        const light = (r+g+b)/3;
+
+        // Remove fundo branco, cinza, bege e tons próximos ao fundo do recorte
+        if(light > 145 || distBg < 70 || (Math.abs(r-g)<22 && Math.abs(g-b)<22 && light>105)){
+          d[i+3]=0;
+        } else {
+          // força a assinatura para preto natural
+          d[i]=18;
+          d[i+1]=18;
+          d[i+2]=18;
+          d[i+3]=255;
+        }
+      }
+
+      ctx.putImageData(image,0,0);
+
+      // Recorta área vazia ao redor da assinatura
+      const img2 = ctx.getImageData(0,0,c.width,c.height).data;
+      let minX=c.width, minY=c.height, maxX=0, maxY=0;
+      for(let y=0;y<c.height;y++){
+        for(let x=0;x<c.width;x++){
+          const a=img2[(y*c.width+x)*4+3];
+          if(a>20){ minX=Math.min(minX,x); minY=Math.min(minY,y); maxX=Math.max(maxX,x); maxY=Math.max(maxY,y); }
+        }
+      }
+
+      if(minX>=maxX || minY>=maxY){
+        resolve(c.toDataURL("image/png"));
+        return;
+      }
+
+      const pad=12;
+      minX=Math.max(0,minX-pad); minY=Math.max(0,minY-pad);
+      maxX=Math.min(c.width,maxX+pad); maxY=Math.min(c.height,maxY+pad);
+
+      const out=document.createElement("canvas");
+      out.width=maxX-minX;
+      out.height=maxY-minY;
+      out.getContext("2d").drawImage(c,minX,minY,out.width,out.height,0,0,out.width,out.height);
+      resolve(out.toDataURL("image/png"));
+    };
+    img.src=dataUrl;
+  });
 }
 
 const br=d=>d?new Date(d).toLocaleDateString("pt-BR"):"—";
@@ -63,10 +113,10 @@ function rmP(idx){setForm(f=>({...f,participantes:f.participantes.filter((_,i)=>
 async function importPdf(file){if(!file)return;setImporting(true);setMsg("Importando PDF e lendo nomes/assinaturas...");try{const{canvas,text}=await pdfPage(file);const parsed=parseText(text);let parts=[];
 for(let i=0;i<parsed.names.length;i++){
 const assinaturaOriginal=crop(canvas,.39,.398+i*.11,.52,.095);
-const assinatura=await removeSignatureBackground(assinaturaOriginal);
+const assinatura=await makeSignatureTransparent(assinaturaOriginal);
 parts.push({nome:parsed.names[i],assinatura});
 }if(!parts.length){for(let i=0;i<10;i++){const nameImg=crop(canvas,.13,.398+i*.11,.24,.095);const r=await recognize(nameImg,"por");const nome=clean(r?.data?.text);if(nome&&nome.length>3)const assinaturaOriginal=crop(canvas,.39,.398+i*.11,.52,.095);
-const assinatura=await removeSignatureBackground(assinaturaOriginal);
+const assinatura=await makeSignatureTransparent(assinaturaOriginal);
 parts.push({nome,assinatura})}}setForm(f=>({...f,curso:parsed.curso||f.curso,instrutor:parsed.instrutor||f.instrutor,data:parsed.data?parsed.data.split("/").reverse().join("-"):f.data,local:parsed.local||f.local,participantes:parts}));setMsg(parts.length?`${parts.length} participante(s) importado(s). Revise antes de imprimir.`:"Não consegui ler nomes automaticamente. Adicione manualmente.")}catch(e){setMsg("Erro ao importar PDF: "+(e?.message||e))}setImporting(false);pdfInput.current&&(pdfInput.current.value="")}
 const certParts=form.participantes.length?form.participantes:[{nome:"Nome do Participante",assinatura:""}];
 return <div className="app">

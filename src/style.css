@@ -20,3 +20,21 @@ filter:contrast(2) brightness(.65)!important;
 padding:0!important;
 box-shadow:none!important;
 }
+
+
+/* Assinatura importada do PDF: sem caixa, sem fundo e com aparência digital */
+.signs img,
+.participantSignature img,
+.pline img {
+  background: transparent !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.signs img {
+  max-height: 74px !important;
+  max-width: 310px !important;
+  object-fit: contain !important;
+}
