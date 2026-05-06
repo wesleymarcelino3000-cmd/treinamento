@@ -1,0 +1,10 @@
+<svg width="1200" height="2400" viewBox="0 0 1200 2400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="2400" fill="#070B1C"/>
+<circle cx="980" cy="280" r="280" fill="#7C3AED" opacity=".22"/>
+<circle cx="150" cy="2050" r="320" fill="#38BDF8" opacity=".10"/>
+<rect x="350" y="865" width="500" height="500" rx="120" fill="url(#g)"/>
+<text x="600" y="1175" text-anchor="middle" font-family="Arial" font-size="220" font-weight="900" fill="white">P</text>
+<text x="600" y="1490" text-anchor="middle" font-family="Arial" font-size="76" font-weight="900" fill="white">PPT SaaS</text>
+<text x="600" y="1585" text-anchor="middle" font-family="Arial" font-size="38" fill="#AAB2D5">Controle premium de apresentações</text>
+<defs><linearGradient id="g" x1="350" y1="865" x2="850" y2="1365"><stop stop-color="#111827"/><stop offset=".55" stop-color="#312E81"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs>
+</svg>
