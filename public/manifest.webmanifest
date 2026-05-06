@@ -1,13 +1,19 @@
 {
   "name": "PPT SaaS Premium",
   "short_name": "PPT SaaS",
-  "description": "Controle premium de apresenta\u00e7\u00f5es aplicadas.",
+  "description": "Controle premium de apresentações aplicadas.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070b1c",
   "theme_color": "#7c3aed",
   "orientation": "portrait-primary",
   "icons": [
+    {
+      "src": "/icons/icon-premium.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
