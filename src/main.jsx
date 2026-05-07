@@ -164,28 +164,111 @@ function printCertificatesOnly(){
 const certs=document.querySelectorAll(".certificate");
 if(!certs.length){ alert("Nenhum certificado para imprimir."); return; }
 const styles=`
-@page{size:A4 landscape;margin:0}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.printPage{width:297mm;height:210mm;page-break-after:always;break-after:page;overflow:hidden;background:#f7f2e8;color:#142018;padding:8mm;font-family:Arial,Helvetica,sans-serif}
-.certBorder{width:100%;height:100%;position:relative;border:7px double #1f5d30;border-radius:12px;text-align:center;padding:26px 52px;background:radial-gradient(circle at 12% 12%,rgba(186,203,0,.16),transparent 25%),radial-gradient(circle at 88% 88%,rgba(0,63,22,.13),transparent 26%),linear-gradient(135deg,#fffdf7,#f4eddc);overflow:hidden}
-.certLogo{max-width:330px;max-height:90px;object-fit:contain}
-.seal{position:absolute;right:50px;top:38px;width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,#0b4b1f,#b6c900);color:white;display:grid;place-items:center}
-.seal svg{width:50px;height:50px}
-.certSmall{text-transform:uppercase;letter-spacing:.22em;color:#557142;font-weight:900;margin:6px 0}
-h1{font-size:52px;letter-spacing:.08em;color:#063b18;margin:8px 0}
-h2{font-size:38px;color:#0c3e1a;border-bottom:2px solid #b6c900;display:inline-block;padding:0 28px 6px;margin:8px 0}
-h3{font-size:28px;color:#1f5d30;margin:10px 0 18px}
-p{margin:8px 0}
-.certInfo{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:780px;margin:0 auto 12px;text-align:left}
-.certInfo span{background:rgba(31,93,48,.08);border:1px solid rgba(31,93,48,.18);border-radius:12px;padding:10px}
-.obsCert{font-style:italic;color:#5a604e}
-.signs{display:grid;grid-template-columns:1fr 1fr;gap:90px;max-width:760px;margin:30px auto 0}
-.signs i{display:block;height:34px;border-bottom:2px solid #25351f}
-.signs img{height:62px;object-fit:contain;display:block;margin:0 auto;background:transparent!important}
-.signs p{font-weight:800;color:#4c5843;margin-top:8px}
-footer{position:absolute;left:60px;right:60px;bottom:18px;color:#6b735d;font-size:13px}
-@media print{.printPage{width:297mm;height:210mm;margin:0;page-break-after:always;break-after:page}}
+@page{
+size:A4 landscape;
+margin:0;
+}
+html,body{
+margin:0;
+padding:0;
+width:100%;
+height:100%;
+background:white;
+-webkit-print-color-adjust:exact;
+print-color-adjust:exact;
+font-family:Arial,Helvetica,sans-serif;
+}
+.printPage{
+width:297mm;
+height:210mm;
+display:flex;
+align-items:center;
+justify-content:center;
+page-break-after:always;
+break-after:page;
+overflow:hidden;
+background:white;
+}
+.certBorder{
+width:277mm;
+height:190mm;
+position:relative;
+border:8px double #8b6b10;
+border-radius:18px;
+text-align:center;
+padding:18mm;
+background:linear-gradient(135deg,#fffdf7,#f2ead2);
+overflow:hidden;
+box-sizing:border-box;
+}
+.certLogo{
+max-width:300px;
+max-height:80px;
+object-fit:contain;
+}
+.certSmall{
+text-transform:uppercase;
+letter-spacing:.22em;
+color:#557142;
+font-weight:900;
+margin:6px 0;
+font-size:14px;
+}
+h1{
+font-size:54px;
+margin:8px 0;
+color:#063b18;
+}
+h2{
+font-size:38px;
+margin:8px 0;
+color:#0c3e1a;
+}
+h3{
+font-size:28px;
+margin:10px 0 18px;
+color:#1f5d30;
+}
+p{
+font-size:16px;
+}
+.certInfo{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-top:18px;
+}
+.certInfo span{
+padding:10px;
+border:1px solid rgba(0,0,0,.15);
+border-radius:10px;
+background:#f7f5ee;
+font-size:15px;
+}
+.signs{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:90px;
+margin-top:35px;
+}
+.signs img{
+height:60px;
+object-fit:contain;
+background:transparent!important;
+}
+.signs i{
+display:block;
+height:36px;
+border-bottom:2px solid #222;
+}
+footer{
+position:absolute;
+left:0;
+right:0;
+bottom:18px;
+font-size:13px;
+color:#666;
+}
 `;
 const html=Array.from(certs).map(c=>`<section class="printPage">${c.querySelector(".certBorder").outerHTML}</section>`).join("");
 const win=window.open("","_blank");
