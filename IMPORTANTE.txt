@@ -1,8 +1,0 @@
-AGORA O CERTIFICADO ESTÁ EM A4 RETRATO.
-
-AO IMPRIMIR:
-- Papel: A4
-- Escala: 100%
-- Margens: Nenhuma
-
-Não precisa mais selecionar paisagem.
