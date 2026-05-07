@@ -259,7 +259,7 @@ async function printCertificatesOnly(){
     });
 
     const logo = await loadImageData("/logo-inno-life.webp");
-    const assinaturaResp = await loadImageData(assinaturaInstrutor || "/assinatura-wesley.png");
+  const assinaturaResp = await loadImageData(assinaturaInstrutor || "/assinatura-wesley.png");
 
     for(let i = 0; i < participantes.length; i++){
       const participante = participantes[i];
@@ -358,7 +358,7 @@ async function printCertificatesOnly(){
       pdf.setLineWidth(0.45);
       if(assinaturaResp){
       try{
-        pdf.addImage(assinaturaResp,"PNG",65,169,52,13);
+        pdf.addImage(assinaturaResp,"PNG",69,174,45,9);
       }catch(e){}
     }
     pdf.line(58,186,125,186);
@@ -366,7 +366,7 @@ async function printCertificatesOnly(){
 
       if(participante.assinatura){
         try{
-          pdf.addImage(participante.assinatura,"PNG",188,169,40,13);
+          pdf.addImage(participante.assinatura,"PNG",186,174,44,9);
         }catch(e){}
       }
 
@@ -407,7 +407,7 @@ Ações</span></div>{shown.map(i=><div className="row" key={i.id}><div className
   <button type="button" className="secondary" onClick={()=>assinaturaInstrutorInput.current?.click()}>Escolher assinatura</button>
   <input ref={assinaturaInstrutorInput} hidden type="file" accept="image/*" onChange={e=>carregarAssinaturaInstrutor(e.target.files?.[0])}/>
 </label>
-</div><div className="certTools"><button className="secondary" onClick={()=>pdfInput.current.click()} disabled={importing}><FileSignature/> {importing?"Importando...":"Importar lista PDF"}</button><button className="secondary" onClick={addP}><Plus/> Adicionar participante</button><button className="primary" onClick={()=>setTimeout(()=>printCertificatesOnly(),300)}><Printer/> Baixar / baixar PDF todos</button><input ref={pdfInput} hidden type="file" accept=".pdf,application/pdf" onChange={e=>importPdf(e.target.files?.[0])}/></div><div className="participants">{form.participantes.map((p,idx)=><div className="pline" key={idx}><span>{String(idx+1).padStart(2,"0")}</span><input value={p.nome} onChange={e=>upP(idx,"nome",e.target.value)} placeholder="Nome"/>{p.assinatura?<img src={p.assinatura}/>:<em>sem assinatura</em>}<button onClick={()=>rmP(idx)}><Trash2/></button></div>)}</div></div><div className="certPages">{certParts.map((p,idx)=><section className="certificate" key={idx}><div className="certBorder"><img className="certLogo" src="/logo-inno-life.webp"/><div className="seal"><Award/></div><p className="certSmall">Certificado de Conclusão</p><h1>CERTIFICADO</h1><p>Certificamos que</p><h2>{p.nome||"Nome do Participante"}</h2><p>participou e concluiu o treinamento</p><h3>{form.curso||cert.nome}</h3><div className="certInfo"><span><b>Data:</b> {br(form.data)}</span><span><b>Carga horária:</b> {form.carga}</span><span><b>Instrutor:</b> {form.instrutor||cert.responsavel||"—"}</span><span><b>Local:</b> {form.local}</span></div>{form.obs&&<p className="obsCert">{form.obs}</p>}<div className="signs"><div>{assinaturaInstrutor && <img src={assinaturaInstrutor}/>}<i></i><p>Responsável / Instrutor</p></div><div>{p.assinatura?<img src={p.assinatura}/>:<i></i>}<p>Assinatura do Participante</p></div></div><footer>Inno Life Nutrition • Transformando conhecimento em qualidade de vida.</footer></div></section>)}</div></div></div>}
+</div><div className="certTools"><button className="secondary" onClick={()=>pdfInput.current.click()} disabled={importing}><FileSignature/> {importing?"Importando...":"Importar lista PDF"}</button><button className="secondary" onClick={addP}><Plus/> Adicionar participante</button><button className="primary" onClick={()=>setTimeout(()=>printCertificatesOnly(),300)}><Printer/> Baixar / baixar PDF todos</button><input ref={pdfInput} hidden type="file" accept=".pdf,application/pdf" onChange={e=>importPdf(e.target.files?.[0])}/></div><div className="participants">{form.participantes.map((p,idx)=><div className="pline" key={idx}><span>{String(idx+1).padStart(2,"0")}</span><input value={p.nome} onChange={e=>upP(idx,"nome",e.target.value)} placeholder="Nome"/>{p.assinatura?<img src={p.assinatura}/>:<em>sem assinatura</em>}<button onClick={()=>rmP(idx)}><Trash2/></button></div>)}</div></div><div className="certPages">{certParts.map((p,idx)=><section className="certificate" key={idx}><div className="certBorder"><img className="certLogo" src="/logo-inno-life.webp"/><div className="seal"><Award/></div><p className="certSmall">Certificado de Conclusão</p><h1>CERTIFICADO</h1><p>Certificamos que</p><h2>{p.nome||"Nome do Participante"}</h2><p>participou e concluiu o treinamento</p><h3>{form.curso||cert.nome}</h3><div className="certInfo"><span><b>Data:</b> {br(form.data)}</span><span><b>Carga horária:</b> {form.carga}</span><span><b>Instrutor:</b> {form.instrutor||cert.responsavel||"—"}</span><span><b>Local:</b> {form.local}</span></div>{form.obs&&<p className="obsCert">{form.obs}</p>}<div className="signs"><div className="responsavelAssinatura">{assinaturaInstrutor && <img src={assinaturaInstrutor}/>}<i></i><p>Responsável / Instrutor</p></div><div>{p.assinatura?<img src={p.assinatura}/>:<i></i>}<p>Assinatura do Participante</p></div></div><footer>Inno Life Nutrition • Transformando conhecimento em qualidade de vida.</footer></div></section>)}</div></div></div>}
 </div>
 }
 createRoot(document.getElementById("root")).render(<App/>);
