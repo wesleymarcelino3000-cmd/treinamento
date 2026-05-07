@@ -1,0 +1,29 @@
+
+CORREÇÃO DO BUILD - TREINERLIFE
+
+ERRO:
+Unexpected ")"
+
+ARQUIVO:
+src/main.jsx
+
+APAGUE ESTA LINHA:
+
+});
+
+QUE ESTÁ LOGO DEPOIS DE:
+
+pdf.text("participou e concluiu o treinamento",148.5,121,{align:"center"});
+
+O TRECHO CORRETO DEVE FICAR ASSIM:
+
+pdf.text("participou e concluiu o treinamento",148.5,121,{align:"center"});
+
+// Texto corrido do certificado
+pdf.setTextColor(20,20,20);
+
+Depois:
+1. Salve
+2. Faça commit
+3. Push
+4. Redeploy no Vercel
