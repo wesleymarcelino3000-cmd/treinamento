@@ -200,6 +200,7 @@ if(pdfInput.current)pdfInput.current.value="";
 
 
 
+
 async function printCertificatesOnly(){
   const participantes = form.participantes.length ? form.participantes : [{nome:"Nome do Participante", assinatura:""}];
 
@@ -232,13 +233,8 @@ async function printCertificatesOnly(){
     pdf.setLineWidth(0.35);
     pdf.roundedRect(14,14,269,182,2,2,"S");
 
-    pdf.setFillColor(235,235,225);
-    pdf.circle(28,30,24,"F");
-    pdf.setFillColor(230,230,220);
-    pdf.circle(268,182,28,"F");
-
     if(logo){
-      pdf.addImage(logo,"PNG",108,16,82,25);
+      pdf.addImage(logo,"PNG",108,14,82,25);
     }
 
     pdf.setFillColor(31,41,55);
@@ -269,6 +265,7 @@ async function printCertificatesOnly(){
     pdf.setFontSize(23);
     const nome = p.nome || "Nome do Participante";
     pdf.text(nome,148.5,99,{align:"center", maxWidth:220});
+
     pdf.setDrawColor(120,120,120);
     pdf.line(70,104,227,104);
 
@@ -310,14 +307,6 @@ async function printCertificatesOnly(){
       pdf.text(String(info[1]).slice(0,38),x+28,y+7.8);
     });
 
-    if(form.obs){
-      pdf.setTextColor(80,80,80);
-      pdf.setFont("helvetica","italic");
-      pdf.setFontSize(9);
-      const obsLines = wrapText(pdf, form.obs, 190).slice(0,2);
-      obsLines.forEach((line,idx)=>pdf.text(line,148.5,184+(idx*5),{align:"center"}));
-    }
-
     pdf.setDrawColor(20,20,20);
     pdf.setLineWidth(0.35);
     pdf.line(58,181,120,181);
@@ -343,6 +332,7 @@ async function printCertificatesOnly(){
 
   pdf.save("certificados-treinerlife.pdf");
 }
+
 
 
 
