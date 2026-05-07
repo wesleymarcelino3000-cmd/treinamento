@@ -1,3 +1,5 @@
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 import React,{useEffect,useMemo,useRef,useState}from"react";
 import{createRoot}from"react-dom/client";
@@ -160,119 +162,36 @@ if(pdfInput.current)pdfInput.current.value="";
 }
 
 
-function printCertificatesOnly(){
+
+async function printCertificatesOnly(){
 const certs=document.querySelectorAll(".certificate");
-if(!certs.length){ alert("Nenhum certificado para baixar PDF."); return; }
-const styles=`
-@page{
-size:A4 portrait;
-margin:0;
+if(!certs.length){
+alert("Nenhum certificado encontrado.");
+return;
 }
 
-html,body{
-margin:0;
-padding:0;
-background:#fff;
-font-family:Arial,sans-serif;
--webkit-print-color-adjust:exact;
-print-color-adjust:exact;
+const pdf=new jsPDF({
+orientation:"portrait",
+unit:"mm",
+format:"a4"
+});
+
+for(let i=0;i<certs.length;i++){
+const canvas=await html2canvas(certs[i],{
+scale:3,
+backgroundColor:"#ffffff"
+});
+
+const img=canvas.toDataURL("image/jpeg",1.0);
+
+if(i>0) pdf.addPage();
+
+pdf.addImage(img,"JPEG",0,0,210,297);
 }
 
-.printPage{
-width:210mm;
-height:297mm;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden;
-page-break-after:always;
-break-after:page;
-background:white;
+pdf.save("certificados-treinerlife.pdf");
 }
 
-.certBorder{
-width:180mm;
-height:257mm;
-margin:auto;
-border:6px double #7f7f7f;
-border-radius:12px;
-padding:10mm;
-box-sizing:border-box;
-background:#f9f7f1;
-overflow:hidden;
-position:relative;
-}
-
-.certLogo{
-max-width:220px;
-max-height:70px;
-object-fit:contain;
-}
-
-h1{
-font-size:30px;
-margin:8px 0;
-}
-
-h2{
-font-size:18px;
-margin:10px 0;
-}
-
-h3{
-font-size:16px;
-margin:8px 0;
-}
-
-.certInfo{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin-top:14px;
-}
-
-.certInfo span{
-padding:8px;
-font-size:12px;
-border:1px solid #ccc;
-border-radius:8px;
-background:#fff;
-}
-
-.signs{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:30px;
-margin-top:28px;
-}
-
-.signs img{
-max-width:180px;
-max-height:55px;
-object-fit:contain;
-background:transparent!important;
-}
-
-.signs i{
-display:block;
-height:28px;
-border-bottom:1px solid #000;
-}
-
-footer{
-position:absolute;
-bottom:10px;
-left:0;
-right:0;
-font-size:10px;
-text-align:center;
-}
-`;
-const html=Array.from(certs).map(c=>`<section class="printPage">${c.querySelector(".certBorder").outerHTML}</section>`).join("");
-const win=window.open("","_blank");
-win.document.write(`<!doctype html><html><head><title>Certificados TreinerLife</title><style>${styles}</style></head><body>${html}<script>window.onload=()=>{setTimeout(()=>window.print(),500)}<\/script></body></html>`);
-win.document.close();
-}
 
 const certParts=form.participantes.length?form.participantes:[{nome:"Nome do Participante",assinatura:""}];
 return <div className="app">
