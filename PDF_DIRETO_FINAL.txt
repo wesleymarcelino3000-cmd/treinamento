@@ -1,4 +1,0 @@
-Esta versão baixa o certificado diretamente em PDF A4 paisagem 297x210mm.
-Não usa tela de impressão do Chrome.
-Não depende de CSS para enquadramento.
-O certificado é desenhado diretamente no PDF e ocupa quase toda a folha.
