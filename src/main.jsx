@@ -1,5 +1,4 @@
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 import React,{useEffect,useMemo,useRef,useState}from"react";
 import{createRoot}from"react-dom/client";
@@ -12,6 +11,41 @@ import"./style.css";
 pdfjsLib.GlobalWorkerOptions.workerSrc=pdfWorker;
 const supabase=createClient(import.meta.env.VITE_SUPABASE_URL,import.meta.env.VITE_SUPABASE_ANON_KEY);
 const BUCKET="ppts";
+
+function loadImageData(src){
+  return new Promise((resolve)=>{
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth || img.width;
+      c.height = img.naturalHeight || img.height;
+      const ctx = c.getContext("2d");
+      ctx.drawImage(img,0,0);
+      resolve(c.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+function wrapText(doc, text, maxWidth){
+  const words = String(text || "").split(" ");
+  const lines = [];
+  let line = "";
+  words.forEach(word=>{
+    const test = line ? line + " " + word : word;
+    if(doc.getTextWidth(test) > maxWidth && line){
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if(line) lines.push(line);
+  return lines;
+}
+
 const today=()=>new Date().toISOString().slice(0,10);
 
 
@@ -164,12 +198,9 @@ if(pdfInput.current)pdfInput.current.value="";
 
 
 
+
 async function printCertificatesOnly(){
-  const certs = document.querySelectorAll(".certificate");
-  if(!certs.length){
-    alert("Nenhum certificado encontrado.");
-    return;
-  }
+  const participantes = form.participantes.length ? form.participantes : [{nome:"Nome do Participante", assinatura:""}];
 
   const pdf = new jsPDF({
     orientation: "landscape",
@@ -177,25 +208,151 @@ async function printCertificatesOnly(){
     format: "a4"
   });
 
-  for(let i = 0; i < certs.length; i++){
-    const canvas = await html2canvas(certs[i], {
-      scale: 3,
-      backgroundColor: "#ffffff",
-      useCORS: true,
-      windowWidth: certs[i].scrollWidth,
-      windowHeight: certs[i].scrollHeight
+  const logo = await loadImageData("/logo-inno-life.webp");
+
+  for(let i=0;i<participantes.length;i++){
+    const p = participantes[i];
+
+    if(i>0) pdf.addPage("a4","landscape");
+
+    // página A4 paisagem: 297 x 210 mm
+    pdf.setFillColor(255,255,255);
+    pdf.rect(0,0,297,210,"F");
+
+    // fundo premium suave
+    pdf.setFillColor(248,247,242);
+    pdf.roundedRect(6,6,285,198,3,3,"F");
+
+    // moldura dupla
+    pdf.setDrawColor(64,64,64);
+    pdf.setLineWidth(0.8);
+    pdf.roundedRect(10,10,277,190,3,3,"S");
+
+    pdf.setDrawColor(150,150,150);
+    pdf.setLineWidth(0.35);
+    pdf.roundedRect(14,14,269,182,2,2,"S");
+
+    // detalhes decorativos
+    pdf.setFillColor(235,235,225);
+    pdf.circle(28,30,24,"F");
+    pdf.setFillColor(230,230,220);
+    pdf.circle(268,182,28,"F");
+
+    // logo
+    if(logo){
+      pdf.addImage(logo,"PNG",108,16,82,25, undefined, "FAST");
+    }
+
+    // selo
+    pdf.setFillColor(31,41,55);
+    pdf.circle(257,36,15,"F");
+    pdf.setTextColor(255,255,255);
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(8);
+    pdf.text("TREINER",257,34,{align:"center"});
+    pdf.text("LIFE",257,39,{align:"center"});
+
+    // título
+    pdf.setTextColor(75,85,99);
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(9);
+    pdf.text("CERTIFICADO DE CONCLUSÃO",148.5,52,{align:"center"});
+
+    pdf.setTextColor(0,0,0);
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(32);
+    pdf.text("CERTIFICADO",148.5,70,{align:"center"});
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(13);
+    pdf.setTextColor(70,70,70);
+    pdf.text("Certificamos que",148.5,84,{align:"center"});
+
+    // nome
+    pdf.setTextColor(0,0,0);
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(23);
+    const nome = p.nome || "Nome do Participante";
+    pdf.text(nome,148.5,99,{align:"center", maxWidth:220});
+    pdf.setDrawColor(120,120,120);
+    pdf.line(70,104,227,104);
+
+    pdf.setTextColor(70,70,70);
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(13);
+    pdf.text("participou e concluiu o treinamento",148.5,117,{align:"center"});
+
+    // curso
+    pdf.setTextColor(20,20,20);
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(17);
+    const cursoLines = wrapText(pdf, form.curso || cert.nome || "Nome do curso", 220);
+    let yCurso = 130;
+    cursoLines.slice(0,2).forEach((line,idx)=>{
+      pdf.text(line,148.5,yCurso+(idx*8),{align:"center"});
     });
 
-    const img = canvas.toDataURL("image/jpeg", 1.0);
+    // caixas de informação
+    const boxY = 150;
+    const boxW = 86;
+    const boxH = 12;
+    const infos = [
+      ["Data", br(form.data)],
+      ["Carga horária", form.carga || "—"],
+      ["Instrutor", form.instrutor || cert.responsavel || "—"],
+      ["Local", form.local || "—"]
+    ];
+    infos.forEach((info,idx)=>{
+      const x = idx%2===0 ? 58 : 153;
+      const y = boxY + (idx>1 ? 17 : 0);
+      pdf.setFillColor(245,245,245);
+      pdf.setDrawColor(210,210,210);
+      pdf.roundedRect(x,y,boxW,boxH,2,2,"FD");
+      pdf.setTextColor(0,0,0);
+      pdf.setFont("helvetica","bold");
+      pdf.setFontSize(8.5);
+      pdf.text(info[0]+":",x+4,y+7.8);
+      pdf.setFont("helvetica","normal");
+      pdf.text(String(info[1]).slice(0,38),x+28,y+7.8);
+    });
 
-    if(i > 0) pdf.addPage("a4", "landscape");
+    // observações
+    if(form.obs){
+      pdf.setTextColor(80,80,80);
+      pdf.setFont("helvetica","italic");
+      pdf.setFontSize(9);
+      const obsLines = wrapText(pdf, form.obs, 190).slice(0,2);
+      obsLines.forEach((line,idx)=>pdf.text(line,148.5,184+(idx*5),{align:"center"}));
+    }
 
-    // A4 paisagem completo: 297 x 210mm
-    pdf.addImage(img, "JPEG", 0, 0, 297, 210, undefined, "FAST");
+    // assinaturas
+    pdf.setDrawColor(20,20,20);
+    pdf.setLineWidth(0.35);
+    pdf.line(58,181,120,181);
+    pdf.line(178,181,240,181);
+
+    if(p.assinatura){
+      try{
+        pdf.addImage(p.assinatura,"PNG",188,166,42,13, undefined, "FAST");
+      }catch(e){}
+    }
+
+    pdf.setTextColor(55,65,81);
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(8.5);
+    pdf.text("Responsável / Instrutor",89,187,{align:"center"});
+    pdf.text("Assinatura do Participante",209,187,{align:"center"});
+
+    // rodapé
+    pdf.setTextColor(100,100,100);
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(8);
+    pdf.text("Inno Life Nutrition • Certificado gerado automaticamente pelo TreinerLife",148.5,197,{align:"center"});
   }
 
   pdf.save("certificados-treinerlife.pdf");
 }
+
 
 
 const pdf=new jsPDF({
