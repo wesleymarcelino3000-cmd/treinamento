@@ -1,7 +1,0 @@
-Agora o app está configurado apenas para:
-- Baixar PDF
-- Sem abrir impressão física automaticamente
-- Mais estável no Chrome
-
-Use:
-Destino -> Salvar como PDF
