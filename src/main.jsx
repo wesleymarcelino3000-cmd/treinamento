@@ -162,7 +162,7 @@ async function pdfPage(file){const buf=await file.arrayBuffer();const pdf=await 
 function parseText(text){const lines=String(text||"").split(/\n+/).map(x=>x.trim()).filter(Boolean);const find=l=>{let i=lines.findIndex(x=>x.toLowerCase().includes(l));if(i>=0){let same=lines[i].split(":").slice(1).join(":").trim();return same||lines[i+1]||""}return""};const names=[];for(const line of lines){const x=line.replace(/^\d+\s*/,"").trim();if(/^[A-Za-zÀ-ÿ ]{5,}$/.test(x)&&!/lista|presen|treinamento|instrutor|local|data|assinatura|participante/i.test(x)&&!names.includes(x))names.push(x)}return{curso:find("treinamento"),instrutor:find("instrutor"),data:find("data"),local:find("local"),names:names.slice(0,40)}}
 function App(){
 const input=useRef(null),pdfInput=useRef(null);
-const[items,setItems]=useState([]),[query,setQuery]=useState(""),[filter,setFilter]=useState("todos"),[msg,setMsg]=useState(""),[uploading,setUploading]=useState(false),[preview,setPreview]=useState(null),[cert,setCert]=useState(null),[importing,setImporting]=useState(false),[menu,setMenu]=useState(false);
+const[items,setItems]=useState([]),[query,setQuery]=useState(""),[filter,setFilter]=useState("todos"),[msg,setMsg]=useState(""),[uploading,setUploading]=useState(false),[preview,setPreview]=useState(null),[cert,setCert]=useState(null),[importing,setImporting]=useState(false),[menu,setMenu]=useState(false);const assinaturaInstrutorInput=useRef(null);const[assinaturaInstrutor,setAssinaturaInstrutor]=useState("/assinatura-wesley.png");
 const[form,setForm]=useState({curso:"",instrutor:"",data:today(),carga:"1 hora",local:"Inno Life Nutrition",obs:"",participantes:[]});
 async function load(){const{data,error}=await supabase.from("ppts").select("*").order("created_at",{ascending:false});if(error)setMsg("Erro ao carregar: "+error.message);else setItems(data||[])}
 useEffect(()=>{load();if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{})},[]);
@@ -173,6 +173,14 @@ async function mark(i,v){const{error}=await supabase.from("ppts").update({aplica
 async function upd(i,f,v){setItems(p=>p.map(x=>x.id===i.id?{...x,[f]:v}:x));const{error}=await supabase.from("ppts").update({[f]:v||null}).eq("id",i.id);if(error)setMsg("Erro ao salvar: "+error.message)}
 async function del(i){if(!confirm("Excluir apresentação?"))return;if(i.caminho)await supabase.storage.from(BUCKET).remove([i.caminho]);await supabase.from("ppts").delete().eq("id",i.id);load()}
 function openCert(i){setCert(i);setForm({curso:i.nome||"",instrutor:i.responsavel||"",data:i.data_aplicacao||today(),carga:"1 hora",local:"Inno Life Nutrition",obs:i.observacao||"",participantes:[]})}
+
+function carregarAssinaturaInstrutor(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => setAssinaturaInstrutor(reader.result);
+  reader.readAsDataURL(file);
+}
+
 function addP(){setForm(f=>({...f,participantes:[...f.participantes,{nome:"",assinatura:""}]}))}
 function upP(idx,field,val){setForm(f=>({...f,participantes:f.participantes.map((p,i)=>i===idx?{...p,[field]:val}:p)}))}
 function rmP(idx){setForm(f=>({...f,participantes:f.participantes.filter((_,i)=>i!==idx)}))}
@@ -251,6 +259,7 @@ async function printCertificatesOnly(){
     });
 
     const logo = await loadImageData("/logo-inno-life.webp");
+    const assinaturaResp = await loadImageData(assinaturaInstrutor || "/assinatura-wesley.png");
 
     for(let i = 0; i < participantes.length; i++){
       const participante = participantes[i];
@@ -347,7 +356,12 @@ async function printCertificatesOnly(){
 
       pdf.setDrawColor(20,20,20);
       pdf.setLineWidth(0.45);
-      pdf.line(58,186,125,186);
+      if(assinaturaResp){
+      try{
+        pdf.addImage(assinaturaResp,"PNG",65,169,52,13);
+      }catch(e){}
+    }
+    pdf.line(58,186,125,186);
       pdf.line(174,186,241,186);
 
       if(participante.assinatura){
@@ -388,7 +402,12 @@ return <div className="app">
 </div>
 Ações</span></div>{shown.map(i=><div className="row" key={i.id}><div className="file"><div className="thumb">{kind(i.nome)}</div><div><b>{i.nome}</b><small>{mb(i.tamanho)}</small></div></div><button className={i.aplicado?"st ok":"st pend"} onClick={()=>mark(i,!i.aplicado)}>{i.aplicado?"Aplicado":"Não aplicado"}</button><input type="date" value={i.data_aplicacao||""} onChange={e=>upd(i,"data_aplicacao",e.target.value)}/><input value={i.responsavel||""} onChange={e=>upd(i,"responsavel",e.target.value)} placeholder="Responsável"/><textarea value={i.observacao||""} onChange={e=>upd(i,"observacao",e.target.value)} placeholder="Observações"/><div className="actions"><button title="Abrir no app" onClick={()=>setPreview(i)}><Eye/></button><button className="cert" title="Certificados" onClick={()=>openCert(i)}><Award/></button><a href={i.url} target="_blank"><Download/></a><button className="danger" onClick={()=>del(i)}><Trash2/></button></div></div>)}</div></section></main>
 {preview&&<div className="modal" onClick={()=>setPreview(null)}><div className="viewer" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setPreview(null)}><X/></button><div className="viewerTop"><div><h2>{preview.nome}</h2><p>Preview via Office Online Viewer. O arquivo precisa estar público no Supabase.</p></div><a className="primary" href={preview.url} target="_blank"><Download/>Baixar</a></div><iframe src={office(preview.url)} title="PPT Preview"></iframe></div></div>}
-{cert&&<div className="modal certModal" onClick={()=>setCert(null)}><div className="certWrap" onClick={e=>e.stopPropagation()}><button className="close noPrint" onClick={()=>setCert(null)}><X/></button><div className="certForm noPrint"><h2><Award/> Certificados em lote</h2><p>Importe a lista de presença em PDF. O app tenta ler os nomes e recortar as assinaturas. Revise antes de baixar PDF.</p><div className="grid"><label>Nome do curso<input value={form.curso} onChange={e=>setForm({...form,curso:e.target.value})}/></label><label>Instrutor<input value={form.instrutor} onChange={e=>setForm({...form,instrutor:e.target.value})}/></label><label>Data<input type="date" value={form.data} onChange={e=>setForm({...form,data:e.target.value})}/></label><label>Carga horária<input value={form.carga} onChange={e=>setForm({...form,carga:e.target.value})}/></label><label>Local<input value={form.local} onChange={e=>setForm({...form,local:e.target.value})}/></label><label>Observações<input value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})}/></label></div><div className="certTools"><button className="secondary" onClick={()=>pdfInput.current.click()} disabled={importing}><FileSignature/> {importing?"Importando...":"Importar lista PDF"}</button><button className="secondary" onClick={addP}><Plus/> Adicionar participante</button><button className="primary" onClick={()=>setTimeout(()=>printCertificatesOnly(),300)}><Printer/> Baixar / baixar PDF todos</button><input ref={pdfInput} hidden type="file" accept=".pdf,application/pdf" onChange={e=>importPdf(e.target.files?.[0])}/></div><div className="participants">{form.participantes.map((p,idx)=><div className="pline" key={idx}><span>{String(idx+1).padStart(2,"0")}</span><input value={p.nome} onChange={e=>upP(idx,"nome",e.target.value)} placeholder="Nome"/>{p.assinatura?<img src={p.assinatura}/>:<em>sem assinatura</em>}<button onClick={()=>rmP(idx)}><Trash2/></button></div>)}</div></div><div className="certPages">{certParts.map((p,idx)=><section className="certificate" key={idx}><div className="certBorder"><img className="certLogo" src="/logo-inno-life.webp"/><div className="seal"><Award/></div><p className="certSmall">Certificado de Conclusão</p><h1>CERTIFICADO</h1><p>Certificamos que</p><h2>{p.nome||"Nome do Participante"}</h2><p>participou e concluiu o treinamento</p><h3>{form.curso||cert.nome}</h3><div className="certInfo"><span><b>Data:</b> {br(form.data)}</span><span><b>Carga horária:</b> {form.carga}</span><span><b>Instrutor:</b> {form.instrutor||cert.responsavel||"—"}</span><span><b>Local:</b> {form.local}</span></div>{form.obs&&<p className="obsCert">{form.obs}</p>}<div className="signs"><div><i></i><p>Responsável / Instrutor</p></div><div>{p.assinatura?<img src={p.assinatura}/>:<i></i>}<p>Assinatura do Participante</p></div></div><footer>Inno Life Nutrition • Transformando conhecimento em qualidade de vida.</footer></div></section>)}</div></div></div>}
+{cert&&<div className="modal certModal" onClick={()=>setCert(null)}><div className="certWrap" onClick={e=>e.stopPropagation()}><button className="close noPrint" onClick={()=>setCert(null)}><X/></button><div className="certForm noPrint"><h2><Award/> Certificados em lote</h2><p>Importe a lista de presença em PDF. O app tenta ler os nomes e recortar as assinaturas. Revise antes de baixar PDF.</p><div className="grid"><label>Nome do curso<input value={form.curso} onChange={e=>setForm({...form,curso:e.target.value})}/></label><label>Instrutor<input value={form.instrutor} onChange={e=>setForm({...form,instrutor:e.target.value})}/></label><label>Data<input type="date" value={form.data} onChange={e=>setForm({...form,data:e.target.value})}/></label><label>Carga horária<input value={form.carga} onChange={e=>setForm({...form,carga:e.target.value})}/></label><label>Local<input value={form.local} onChange={e=>setForm({...form,local:e.target.value})}/></label><label>Observações<input value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})}/></label>
+<label>Assinatura do responsável/instrutor
+  <button type="button" className="secondary" onClick={()=>assinaturaInstrutorInput.current?.click()}>Escolher assinatura</button>
+  <input ref={assinaturaInstrutorInput} hidden type="file" accept="image/*" onChange={e=>carregarAssinaturaInstrutor(e.target.files?.[0])}/>
+</label>
+</div><div className="certTools"><button className="secondary" onClick={()=>pdfInput.current.click()} disabled={importing}><FileSignature/> {importing?"Importando...":"Importar lista PDF"}</button><button className="secondary" onClick={addP}><Plus/> Adicionar participante</button><button className="primary" onClick={()=>setTimeout(()=>printCertificatesOnly(),300)}><Printer/> Baixar / baixar PDF todos</button><input ref={pdfInput} hidden type="file" accept=".pdf,application/pdf" onChange={e=>importPdf(e.target.files?.[0])}/></div><div className="participants">{form.participantes.map((p,idx)=><div className="pline" key={idx}><span>{String(idx+1).padStart(2,"0")}</span><input value={p.nome} onChange={e=>upP(idx,"nome",e.target.value)} placeholder="Nome"/>{p.assinatura?<img src={p.assinatura}/>:<em>sem assinatura</em>}<button onClick={()=>rmP(idx)}><Trash2/></button></div>)}</div></div><div className="certPages">{certParts.map((p,idx)=><section className="certificate" key={idx}><div className="certBorder"><img className="certLogo" src="/logo-inno-life.webp"/><div className="seal"><Award/></div><p className="certSmall">Certificado de Conclusão</p><h1>CERTIFICADO</h1><p>Certificamos que</p><h2>{p.nome||"Nome do Participante"}</h2><p>participou e concluiu o treinamento</p><h3>{form.curso||cert.nome}</h3><div className="certInfo"><span><b>Data:</b> {br(form.data)}</span><span><b>Carga horária:</b> {form.carga}</span><span><b>Instrutor:</b> {form.instrutor||cert.responsavel||"—"}</span><span><b>Local:</b> {form.local}</span></div>{form.obs&&<p className="obsCert">{form.obs}</p>}<div className="signs"><div>{assinaturaInstrutor && <img src={assinaturaInstrutor}/>}<i></i><p>Responsável / Instrutor</p></div><div>{p.assinatura?<img src={p.assinatura}/>:<i></i>}<p>Assinatura do Participante</p></div></div><footer>Inno Life Nutrition • Transformando conhecimento em qualidade de vida.</footer></div></section>)}</div></div></div>}
 </div>
 }
 createRoot(document.getElementById("root")).render(<App/>);
