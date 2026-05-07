@@ -176,10 +176,11 @@ print-color-adjust:exact;
 font-family:Arial,Helvetica,sans-serif;
 }
 .printPage{
-width:210mm;height:297mm;
+width:170mm;height:250mm;
 display:flex;
-align-items:center;
+align-items:flex-start;
 justify-content:center;
+padding-top:8mm;
 page-break-after:always;
 break-after:page;
 overflow:hidden;

@@ -109,3 +109,20 @@ box-sizing:border-box !important;
 
 /* FORÇA TAMANHO REAL */
 @page{size:A4 portrait;margin:0;}
+
+
+@media print{
+html,body{
+overflow:hidden!important;
+}
+
+.certificate{
+transform:none!important;
+zoom:1!important;
+margin:0 auto!important;
+}
+
+.certBorder{
+margin:0 auto!important;
+}
+}
