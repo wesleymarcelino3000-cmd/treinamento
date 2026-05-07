@@ -451,3 +451,45 @@ margin:0 auto!important;
   margin-bottom:-3px!important;
   object-fit:contain!important;
 }
+
+
+/* Novo modelo premium */
+.textoConclusao{
+  width:100%;
+  text-align:center;
+  margin-top:40px;
+  margin-bottom:70px;
+
+  font-size:28px;
+  line-height:1.9;
+  color:#111827;
+  font-weight:400;
+}
+
+.textoConclusao strong{
+  font-weight:700;
+}
+
+/* Remove quadros antigos */
+.infoRow{
+  display:none!important;
+}
+
+/* Ajuste das assinaturas */
+.responsavelAssinatura img{
+  width:63mm!important;
+  margin-top:25px!important;
+  margin-bottom:-2px!important;
+}
+
+.assinaturaParticipante img,
+.signs > div:not(.responsavelAssinatura) img{
+  width:52mm!important;
+  margin-top:25px!important;
+  margin-bottom:-2px!important;
+}
+
+/* Certificado mais limpo */
+.certificado{
+  padding-top:35px!important;
+}

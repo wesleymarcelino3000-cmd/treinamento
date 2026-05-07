@@ -394,7 +394,14 @@ return <div className="app">
 <main className="main"><button className="mobile" onClick={()=>setMenu(!menu)}><Menu/></button><header className="hero"><div><small>Dashboard premium</small><h1>Treinamentos, PPTs e certificados em lote</h1><p>Abra o PPT dentro do app e gere certificados A4 com logo, nome e assinatura da lista de presença.</p></div><button className="primary" onClick={()=>input.current.click()} disabled={uploading}><Upload/> {uploading?"Enviando...":"Upload PPT/PPTX"}</button><input ref={input} hidden multiple type="file" accept=".ppt,.pptx" onChange={e=>upload(e.target.files)}/></header>
 {msg&&<div className={msg.includes("sucesso")||msg.includes("importado")?"toast ok":"toast"}>{msg}</div>}
 <section className="metrics"><article><FileText/><span>Total</span><b>{items.length}</b></article><article className="green"><CheckCircle2/><span>Aplicados</span><b>{applied}</b></article><article className="orange"><Clock3/><span>Não aplicados</span><b>{items.length-applied}</b></article><article className="purple"><Award/><span>Certificado</span><b>A4</b></article></section>
-<section className="drop" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();upload(e.dataTransfer.files)}} onClick={()=>input.current.click()}><Upload/><h2>Arraste seus PPTs aqui</h2><p>Upload múltiplo .ppt e .pptx</p></section>
+<section className="drop" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();upload(e.dataTransfer.files)}} onClick={()=>input.current.click()}><Upload/><h2>Arraste seus PPTs aqui</h2>
+
+<div className="textoConclusao">
+  concluiu o treinamento “{form.curso}”,<br/>
+  realizado no dia <strong>{form.data}</strong>, com carga horária de <strong>{form.carga}</strong>,<br/>
+  no local <strong>{form.local}</strong>.
+</div>
+<p>Upload múltiplo .ppt e .pptx</p></section>
 <section className="panel"><div className="top"><div><h2>Apresentações</h2><p>{shown.length} resultado(s)</p></div><div className="filters"><div className="search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar..."/></div><select value={filter} onChange={e=>setFilter(e.target.value)}><option value="todos">Todos</option><option value="aplicados">Aplicados</option><option value="nao">Não aplicados</option></select></div></div>
 <div className="table"><div className="thead"><span>Arquivo</span><span>Status</span><span>Data</span><span>Responsável</span><span>Observação</span><span>
 <div className="mt-3">
