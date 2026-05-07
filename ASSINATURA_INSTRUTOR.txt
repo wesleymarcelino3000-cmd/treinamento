@@ -1,0 +1,4 @@
+Incluído:
+- Assinatura padrão Wesley Marcelino de Jesus no responsável/instrutor
+- Todos os certificados gerados já saem com essa assinatura
+- Opção no modal de certificado para escolher outra imagem de assinatura
