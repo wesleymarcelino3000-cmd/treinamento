@@ -1,9 +1,0 @@
-AGORA O CERTIFICADO PREENCHE A FOLHA A4.
-
-AO IMPRIMIR:
-- Layout: Paisagem
-- Escala: Padrão / 100%
-- Margens: Nenhuma
-- Papel: A4
-
-Não use 'Ajustar à página'.
