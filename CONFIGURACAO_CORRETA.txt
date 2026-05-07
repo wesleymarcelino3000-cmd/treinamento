@@ -1,8 +1,0 @@
-CONFIGURAÇÃO CORRETA
-
-Papel: A4
-Orientação: Paisagem
-Margens: Nenhuma
-Escala: Padrão / 100%
-
-Agora o certificado fica centralizado igual ao modelo aprovado.
