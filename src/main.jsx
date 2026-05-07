@@ -12,6 +12,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc=pdfWorker;
 const supabase=createClient(import.meta.env.VITE_SUPABASE_URL,import.meta.env.VITE_SUPABASE_ANON_KEY);
 const BUCKET="ppts";
 
+function safeText(value){
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+
 function loadImageData(src){
   return new Promise((resolve)=>{
     const img = new Image();
