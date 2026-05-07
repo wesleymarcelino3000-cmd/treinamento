@@ -1,9 +1,0 @@
-MELHORIAS REAIS APLICADAS
-
-- Certificado redesenhado com borda dourada premium
-- Fundo refinado estilo corporativo
-- Assinaturas com blend mode para remover fundo branco
-- Ajuste real de impressão A4 landscape
-- PPT abre em visualização/apresentação Office
-- PDF pronto ao imprimir/salvar
-
