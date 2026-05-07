@@ -171,7 +171,7 @@ return;
 }
 
 const pdf=new jsPDF({
-orientation:"portrait",
+orientation:"landscape",
 unit:"mm",
 format:"a4"
 });
@@ -186,7 +186,7 @@ const img=canvas.toDataURL("image/jpeg",1.0);
 
 if(i>0) pdf.addPage();
 
-pdf.addImage(img,"JPEG",0,0,210,297);
+pdf.addImage(img,"JPEG",0,0,297,210);
 }
 
 pdf.save("certificados-treinerlife.pdf");
