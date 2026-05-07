@@ -1,6 +1,0 @@
-Layout aplicado conforme modelo aprovado:
-- A4 paisagem real: 297mm x 210mm
-- Certificado ocupa quase toda a folha
-- Margem pequena e centralizada
-- Download PDF direto usando jsPDF + html2canvas
-- Não depende mais do enquadramento do preview do navegador
