@@ -163,15 +163,43 @@ if(pdfInput.current)pdfInput.current.value="";
 
 
 
+
 async function printCertificatesOnly(){
-const certs=document.querySelectorAll(".certificate");
-if(!certs.length){
-alert("Nenhum certificado encontrado.");
-return;
+  const certs = document.querySelectorAll(".certificate");
+  if(!certs.length){
+    alert("Nenhum certificado encontrado.");
+    return;
+  }
+
+  const pdf = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: "a4"
+  });
+
+  for(let i = 0; i < certs.length; i++){
+    const canvas = await html2canvas(certs[i], {
+      scale: 3,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      windowWidth: certs[i].scrollWidth,
+      windowHeight: certs[i].scrollHeight
+    });
+
+    const img = canvas.toDataURL("image/jpeg", 1.0);
+
+    if(i > 0) pdf.addPage("a4", "landscape");
+
+    // A4 paisagem completo: 297 x 210mm
+    pdf.addImage(img, "JPEG", 0, 0, 297, 210, undefined, "FAST");
+  }
+
+  pdf.save("certificados-treinerlife.pdf");
 }
 
+
 const pdf=new jsPDF({
-orientation:"landscape",
+orientation:"portrait",
 unit:"mm",
 format:"a4"
 });
@@ -186,7 +214,7 @@ const img=canvas.toDataURL("image/jpeg",1.0);
 
 if(i>0) pdf.addPage();
 
-pdf.addImage(img,"JPEG",0,0,297,210);
+pdf.addImage(img,"JPEG",0,0,210,297);
 }
 
 pdf.save("certificados-treinerlife.pdf");
