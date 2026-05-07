@@ -1,9 +1,0 @@
-CONFIGURAÇÃO FINAL
-
-NO GOOGLE CHROME:
-- Papel: A4
-- Margens: Padrão
-- Escala: Padrão
-- NÃO usar "Ajustar à página"
-
-Agora o certificado foi reduzido levemente para não cortar em nenhuma impressora.
