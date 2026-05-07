@@ -1,7 +1,0 @@
-Aplicado:
-- Assinatura do responsável/instrutor menor
-- Fica próxima da linha
-- Ocupa somente a linha do responsável/instrutor
-- Assinatura importada do participante não apaga a linha abaixo
-- Assinatura padrão Wesley em PNG transparente
-- Opção de trocar assinatura do responsável no app
