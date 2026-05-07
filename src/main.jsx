@@ -199,6 +199,7 @@ if(pdfInput.current)pdfInput.current.value="";
 
 
 
+
 async function printCertificatesOnly(){
   const participantes = form.participantes.length ? form.participantes : [{nome:"Nome do Participante", assinatura:""}];
 
@@ -213,17 +214,16 @@ async function printCertificatesOnly(){
   for(let i=0;i<participantes.length;i++){
     const p = participantes[i];
 
-    if(i>0) pdf.addPage("a4","landscape");
+    if(i > 0){
+      pdf.addPage("a4", "landscape");
+    }
 
-    // página A4 paisagem: 297 x 210 mm
     pdf.setFillColor(255,255,255);
     pdf.rect(0,0,297,210,"F");
 
-    // fundo premium suave
     pdf.setFillColor(248,247,242);
     pdf.roundedRect(6,6,285,198,3,3,"F");
 
-    // moldura dupla
     pdf.setDrawColor(64,64,64);
     pdf.setLineWidth(0.8);
     pdf.roundedRect(10,10,277,190,3,3,"S");
@@ -232,18 +232,15 @@ async function printCertificatesOnly(){
     pdf.setLineWidth(0.35);
     pdf.roundedRect(14,14,269,182,2,2,"S");
 
-    // detalhes decorativos
     pdf.setFillColor(235,235,225);
     pdf.circle(28,30,24,"F");
     pdf.setFillColor(230,230,220);
     pdf.circle(268,182,28,"F");
 
-    // logo
     if(logo){
-      pdf.addImage(logo,"PNG",108,16,82,25, undefined, "FAST");
+      pdf.addImage(logo,"PNG",108,16,82,25);
     }
 
-    // selo
     pdf.setFillColor(31,41,55);
     pdf.circle(257,36,15,"F");
     pdf.setTextColor(255,255,255);
@@ -252,7 +249,6 @@ async function printCertificatesOnly(){
     pdf.text("TREINER",257,34,{align:"center"});
     pdf.text("LIFE",257,39,{align:"center"});
 
-    // título
     pdf.setTextColor(75,85,99);
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(9);
@@ -268,7 +264,6 @@ async function printCertificatesOnly(){
     pdf.setTextColor(70,70,70);
     pdf.text("Certificamos que",148.5,84,{align:"center"});
 
-    // nome
     pdf.setTextColor(0,0,0);
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(23);
@@ -282,7 +277,6 @@ async function printCertificatesOnly(){
     pdf.setFontSize(13);
     pdf.text("participou e concluiu o treinamento",148.5,117,{align:"center"});
 
-    // curso
     pdf.setTextColor(20,20,20);
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(17);
@@ -292,7 +286,6 @@ async function printCertificatesOnly(){
       pdf.text(line,148.5,yCurso+(idx*8),{align:"center"});
     });
 
-    // caixas de informação
     const boxY = 150;
     const boxW = 86;
     const boxH = 12;
@@ -302,9 +295,10 @@ async function printCertificatesOnly(){
       ["Instrutor", form.instrutor || cert.responsavel || "—"],
       ["Local", form.local || "—"]
     ];
+
     infos.forEach((info,idx)=>{
-      const x = idx%2===0 ? 58 : 153;
-      const y = boxY + (idx>1 ? 17 : 0);
+      const x = idx % 2 === 0 ? 58 : 153;
+      const y = boxY + (idx > 1 ? 17 : 0);
       pdf.setFillColor(245,245,245);
       pdf.setDrawColor(210,210,210);
       pdf.roundedRect(x,y,boxW,boxH,2,2,"FD");
@@ -316,7 +310,6 @@ async function printCertificatesOnly(){
       pdf.text(String(info[1]).slice(0,38),x+28,y+7.8);
     });
 
-    // observações
     if(form.obs){
       pdf.setTextColor(80,80,80);
       pdf.setFont("helvetica","italic");
@@ -325,7 +318,6 @@ async function printCertificatesOnly(){
       obsLines.forEach((line,idx)=>pdf.text(line,148.5,184+(idx*5),{align:"center"}));
     }
 
-    // assinaturas
     pdf.setDrawColor(20,20,20);
     pdf.setLineWidth(0.35);
     pdf.line(58,181,120,181);
@@ -333,7 +325,7 @@ async function printCertificatesOnly(){
 
     if(p.assinatura){
       try{
-        pdf.addImage(p.assinatura,"PNG",188,166,42,13, undefined, "FAST");
+        pdf.addImage(p.assinatura,"PNG",188,166,42,13);
       }catch(e){}
     }
 
@@ -343,7 +335,6 @@ async function printCertificatesOnly(){
     pdf.text("Responsável / Instrutor",89,187,{align:"center"});
     pdf.text("Assinatura do Participante",209,187,{align:"center"});
 
-    // rodapé
     pdf.setTextColor(100,100,100);
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(8);
@@ -352,6 +343,7 @@ async function printCertificatesOnly(){
 
   pdf.save("certificados-treinerlife.pdf");
 }
+
 
 
 
