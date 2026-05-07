@@ -1,7 +1,0 @@
-Versão corrigida:
-- Remove window.print()
-- Remove html2canvas()
-- Remove impressão do Chrome
-- Botão gera PDF direto com jsPDF
-- PDF A4 paisagem 297x210mm
-- Certificado ocupa quase toda a folha
