@@ -12,6 +12,31 @@ pdfjsLib.GlobalWorkerOptions.workerSrc=pdfWorker;
 const supabase=createClient(import.meta.env.VITE_SUPABASE_URL,import.meta.env.VITE_SUPABASE_ANON_KEY);
 const BUCKET="ppts";
 
+
+
+function wrapPdfText(doc, text, maxWidth){
+  const words = String(text || "").split(" ");
+  const lines = [];
+  let line = "";
+
+  words.forEach((word)=>{
+    const test = line ? line + " " + word : word;
+
+    if(doc.getTextWidth(test) > maxWidth && line){
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+
+  if(line){
+    lines.push(line);
+  }
+
+  return lines;
+}
+
 function safeText(value){
   return String(value || "").replace(/\s+/g, " ").trim();
 }
