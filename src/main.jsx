@@ -358,7 +358,7 @@ async function printCertificatesOnly(){
       pdf.setLineWidth(0.45);
       if(assinaturaResp){
       try{
-        pdf.addImage(assinaturaResp,"PNG",69,174,45,9);
+        pdf.addImage(assinaturaResp,"PNG",60,170,63,13);
       }catch(e){}
     }
     pdf.line(58,186,125,186);
