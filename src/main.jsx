@@ -164,10 +164,7 @@ function printCertificatesOnly(){
 const certs=document.querySelectorAll(".certificate");
 if(!certs.length){ alert("Nenhum certificado para imprimir."); return; }
 const styles=`
-@page{
-size:A4 landscape;
-margin:0;
-}
+@page{size:A4 portrait;margin:0;}
 html,body{
 margin:0;
 padding:0;
@@ -179,8 +176,7 @@ print-color-adjust:exact;
 font-family:Arial,Helvetica,sans-serif;
 }
 .printPage{
-width:297mm;
-height:210mm;
+width:210mm;height:297mm;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -190,13 +186,12 @@ overflow:hidden;
 background:white;
 }
 .certBorder{
-width:277mm;
-height:190mm;
+width:190mm;height:277mm;
 position:relative;
 border:8px double #8b6b10;
 border-radius:18px;
 text-align:center;
-padding:18mm;
+padding:12mm;
 background:linear-gradient(135deg,#fffdf7,#f2ead2);
 overflow:hidden;
 box-sizing:border-box;
