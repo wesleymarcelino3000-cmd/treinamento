@@ -182,3 +182,65 @@ scale:1 !important;
 zoom:1 !important;
 }
 }
+
+
+/* CERTIFICADO FINAL A4 PAISAGEM */
+@page{
+  size:A4 landscape;
+  margin:0;
+}
+
+html,body{
+  background:#ffffff !important;
+}
+
+.certificate{
+  width:297mm !important;
+  height:210mm !important;
+  margin:0 auto !important;
+  padding:8mm !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+  background:white !important;
+}
+
+.certBorder{
+  width:281mm !important;
+  height:194mm !important;
+  margin:auto !important;
+  padding:12mm !important;
+  box-sizing:border-box !important;
+  border-radius:12px !important;
+  overflow:hidden !important;
+}
+
+@media print{
+
+html,body{
+  width:297mm !important;
+  height:210mm !important;
+  overflow:hidden !important;
+  background:white !important;
+  -webkit-print-color-adjust:exact !important;
+  print-color-adjust:exact !important;
+}
+
+.certificate{
+  width:297mm !important;
+  height:210mm !important;
+  margin:0 auto !important;
+  transform:none !important;
+  scale:1 !important;
+  zoom:1 !important;
+}
+
+.certBorder{
+  width:281mm !important;
+  height:194mm !important;
+  margin:auto !important;
+}
+
+}
