@@ -159,6 +159,40 @@ setImporting(false);
 if(pdfInput.current)pdfInput.current.value="";
 }
 
+
+function printCertificatesOnly(){
+const certs=document.querySelectorAll(".certificate");
+if(!certs.length){ alert("Nenhum certificado para imprimir."); return; }
+const styles=`
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.printPage{width:297mm;height:210mm;page-break-after:always;break-after:page;overflow:hidden;background:#f7f2e8;color:#142018;padding:8mm;font-family:Arial,Helvetica,sans-serif}
+.certBorder{width:100%;height:100%;position:relative;border:7px double #1f5d30;border-radius:12px;text-align:center;padding:26px 52px;background:radial-gradient(circle at 12% 12%,rgba(186,203,0,.16),transparent 25%),radial-gradient(circle at 88% 88%,rgba(0,63,22,.13),transparent 26%),linear-gradient(135deg,#fffdf7,#f4eddc);overflow:hidden}
+.certLogo{max-width:330px;max-height:90px;object-fit:contain}
+.seal{position:absolute;right:50px;top:38px;width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,#0b4b1f,#b6c900);color:white;display:grid;place-items:center}
+.seal svg{width:50px;height:50px}
+.certSmall{text-transform:uppercase;letter-spacing:.22em;color:#557142;font-weight:900;margin:6px 0}
+h1{font-size:52px;letter-spacing:.08em;color:#063b18;margin:8px 0}
+h2{font-size:38px;color:#0c3e1a;border-bottom:2px solid #b6c900;display:inline-block;padding:0 28px 6px;margin:8px 0}
+h3{font-size:28px;color:#1f5d30;margin:10px 0 18px}
+p{margin:8px 0}
+.certInfo{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:780px;margin:0 auto 12px;text-align:left}
+.certInfo span{background:rgba(31,93,48,.08);border:1px solid rgba(31,93,48,.18);border-radius:12px;padding:10px}
+.obsCert{font-style:italic;color:#5a604e}
+.signs{display:grid;grid-template-columns:1fr 1fr;gap:90px;max-width:760px;margin:30px auto 0}
+.signs i{display:block;height:34px;border-bottom:2px solid #25351f}
+.signs img{height:62px;object-fit:contain;display:block;margin:0 auto;background:transparent!important}
+.signs p{font-weight:800;color:#4c5843;margin-top:8px}
+footer{position:absolute;left:60px;right:60px;bottom:18px;color:#6b735d;font-size:13px}
+@media print{.printPage{width:297mm;height:210mm;margin:0;page-break-after:always;break-after:page}}
+`;
+const html=Array.from(certs).map(c=>`<section class="printPage">${c.querySelector(".certBorder").outerHTML}</section>`).join("");
+const win=window.open("","_blank");
+win.document.write(`<!doctype html><html><head><title>Certificados TreinerLife</title><style>${styles}</style></head><body>${html}<script>window.onload=()=>{setTimeout(()=>window.print(),500)}<\/script></body></html>`);
+win.document.close();
+}
+
 const certParts=form.participantes.length?form.participantes:[{nome:"Nome do Participante",assinatura:""}];
 return <div className="app">
 <aside className={menu?"side open":"side"}><div className="brand"><div className="logo">P</div><div><b>TreinerLife</b><span>Treinamentos Premium</span></div></div><button className="active">Dashboard</button><button onClick={()=>input.current.click()}><Upload/> Upload múltiplo</button><button onClick={()=>setFilter("aplicados")}><CheckCircle2/> Aplicados</button><button onClick={()=>setFilter("nao")}><Clock3/> Não aplicados</button><div className="cardMini"><Award/><b>Certificados A4</b><p>Importe PDF da presença e gere um certificado por participante.</p></div></aside>
