@@ -139,3 +139,46 @@ width:277mm!important;
 height:190mm!important;
 margin:auto!important;
 }
+
+
+/* A4 paisagem corrigido */
+@page{
+size:A4 landscape;
+margin:0;
+}
+
+.certificate{
+width:297mm !important;
+height:210mm !important;
+display:flex !important;
+align-items:center !important;
+justify-content:center !important;
+padding:0 !important;
+margin:0 auto !important;
+overflow:hidden !important;
+background:white !important;
+}
+
+.certBorder{
+width:270mm !important;
+height:183mm !important;
+margin:auto !important;
+padding:12mm !important;
+box-sizing:border-box !important;
+overflow:hidden !important;
+}
+
+@media print{
+html,body{
+width:297mm !important;
+height:210mm !important;
+overflow:hidden !important;
+background:white !important;
+}
+
+.certificate{
+transform:none !important;
+scale:1 !important;
+zoom:1 !important;
+}
+}
