@@ -332,34 +332,6 @@ async function printCertificatesOnly(){
 
   pdf.save("certificados-treinerlife.pdf");
 }
-
-
-
-
-
-const pdf=new jsPDF({
-orientation:"portrait",
-unit:"mm",
-format:"a4"
-});
-
-for(let i=0;i<certs.length;i++){
-const canvas=await html2canvas(certs[i],{
-scale:3,
-backgroundColor:"#ffffff"
-});
-
-const img=canvas.toDataURL("image/jpeg",1.0);
-
-if(i>0) pdf.addPage();
-
-pdf.addImage(img,"JPEG",0,0,210,297);
-}
-
-pdf.save("certificados-treinerlife.pdf");
-}
-
-
 const certParts=form.participantes.length?form.participantes:[{nome:"Nome do Participante",assinatura:""}];
 return <div className="app">
 <aside className={menu?"side open":"side"}><div className="brand"><div className="logo">P</div><div><b>TreinerLife</b><span>Treinamentos Premium</span></div></div><button className="active">Dashboard</button><button onClick={()=>input.current.click()}><Upload/> Upload múltiplo</button><button onClick={()=>setFilter("aplicados")}><CheckCircle2/> Aplicados</button><button onClick={()=>setFilter("nao")}><Clock3/> Não aplicados</button><div className="cardMini"><Award/><b>Certificados A4</b><p>Importe PDF da presença e gere um certificado por participante.</p></div></aside>
