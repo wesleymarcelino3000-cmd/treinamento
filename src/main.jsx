@@ -202,6 +202,8 @@ if(pdfInput.current)pdfInput.current.value="";
 
 
 
+
+
 async function printCertificatesOnly(){
   const participantes = form.participantes.length
     ? form.participantes
@@ -210,99 +212,87 @@ async function printCertificatesOnly(){
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "mm",
-    format: [297, 210]
+    format: "a4"
   });
 
   const logo = await loadImageData("/logo-inno-life.webp");
 
   for(let i = 0; i < participantes.length; i++){
-    const p = participantes[i];
+    const participante = participantes[i];
 
     if(i > 0){
-      pdf.addPage([297, 210], "landscape");
+      pdf.addPage("a4", "landscape");
     }
 
-    // FUNDO A4 INTEIRO
+    // Página A4 paisagem exata: 297mm x 210mm
     pdf.setFillColor(255,255,255);
-    pdf.rect(0, 0, 297, 210, "F");
+    pdf.rect(0,0,297,210,"F");
 
-    // CERTIFICADO OCUPANDO QUASE TODA A FOLHA
-    const x = 8;
-    const y = 8;
-    const w = 281;
-    const h = 194;
-
+    // Área do certificado quase na folha toda
     pdf.setFillColor(248,248,246);
-    pdf.roundedRect(x, y, w, h, 2.5, 2.5, "F");
+    pdf.roundedRect(8,8,281,194,3,3,"F");
 
-    // BORDA DUPLA
-    pdf.setDrawColor(55,55,55);
-    pdf.setLineWidth(1.0);
-    pdf.roundedRect(x + 2, y + 2, w - 4, h - 4, 2.5, 2.5, "S");
-
-    pdf.setDrawColor(120,120,120);
+    // Moldura dupla
+    pdf.setDrawColor(50,50,50);
+    pdf.setLineWidth(1);
+    pdf.roundedRect(10,10,277,190,3,3,"S");
+    pdf.setDrawColor(145,145,145);
     pdf.setLineWidth(0.45);
-    pdf.roundedRect(x + 4, y + 4, w - 8, h - 8, 2, 2, "S");
+    pdf.roundedRect(14,14,269,182,2,2,"S");
 
-    // LOGO
+    // Logo Inno Life
     if(logo){
-      pdf.addImage(logo, "PNG", 108, 18, 82, 24);
+      pdf.addImage(logo,"PNG",108,18,82,24);
     }
 
-    // SELO
-    pdf.setFillColor(64,64,64);
-    pdf.circle(258, 36, 14, "F");
+    // Selo
+    pdf.setFillColor(55,55,55);
+    pdf.circle(258,36,14,"F");
     pdf.setTextColor(255,255,255);
     pdf.setFont("helvetica","bold");
-    pdf.setFontSize(8);
-    pdf.text("✓", 258, 39, { align: "center" });
+    pdf.setFontSize(15);
+    pdf.text("✓",258,40,{align:"center"});
 
-    // TITULOS
-    pdf.setTextColor(70,70,70);
+    // Cabeçalho
+    pdf.setTextColor(65,65,65);
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(10);
-    pdf.text("CERTIFICADO DE CONCLUSÃO", 148.5, 54, { align: "center" });
+    pdf.text("CERTIFICADO DE CONCLUSÃO",148.5,54,{align:"center"});
 
     pdf.setTextColor(0,0,0);
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(34);
-    pdf.text("CERTIFICADO", 148.5, 72, { align: "center" });
+    pdf.text("CERTIFICADO",148.5,72,{align:"center"});
 
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(13);
-    pdf.setTextColor(40,40,40);
-    pdf.text("Certificamos que", 148.5, 88, { align: "center" });
+    pdf.setTextColor(35,35,35);
+    pdf.text("Certificamos que",148.5,88,{align:"center"});
 
-    // NOME
+    // Nome
     pdf.setTextColor(0,0,0);
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(24);
-    pdf.text(p.nome || "Nome do Participante", 148.5, 103, { align: "center", maxWidth: 230 });
+    pdf.text(safeText(participante.nome || "Nome do Participante"),148.5,103,{align:"center",maxWidth:230});
     pdf.setDrawColor(110,110,110);
-    pdf.line(78, 108, 219, 108);
+    pdf.line(78,108,219,108);
 
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(13);
-    pdf.setTextColor(40,40,40);
-    pdf.text("participou e concluiu o treinamento", 148.5, 121, { align: "center" });
+    pdf.setTextColor(35,35,35);
+    pdf.text("participou e concluiu o treinamento",148.5,121,{align:"center"});
 
-    // CURSO
+    // Curso editável
     pdf.setTextColor(0,0,0);
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(17);
-    const cursoLines = wrapText(pdf, form.curso || cert.nome || "Nome do curso", 240).slice(0, 2);
-    cursoLines.forEach((line, idx)=>{
-      pdf.text(line, 148.5, 134 + idx * 8, { align: "center" });
+    const curso = safeText(form.curso || cert.nome || "Nome do curso");
+    const cursoLines = wrapPdfText(pdf, curso, 240).slice(0,2);
+    cursoLines.forEach((line,idx)=>{
+      pdf.text(line,148.5,134 + idx * 8,{align:"center"});
     });
 
-    // INFO BOXES
-    const boxW = 92;
-    const boxH = 12;
-    const leftX = 55;
-    const rightX = 150;
-    const topY = 153;
-    const gapY = 17;
-
+    // Informações
     const infos = [
       ["Data", br(form.data)],
       ["Carga horária", form.carga || "—"],
@@ -310,46 +300,46 @@ async function printCertificatesOnly(){
       ["Local", form.local || "—"]
     ];
 
-    infos.forEach((info, idx)=>{
-      const bx = idx % 2 === 0 ? leftX : rightX;
-      const by = topY + (idx > 1 ? gapY : 0);
+    infos.forEach((info,idx)=>{
+      const bx = idx % 2 === 0 ? 55 : 150;
+      const by = 153 + (idx > 1 ? 17 : 0);
 
       pdf.setFillColor(240,240,240);
       pdf.setDrawColor(205,205,205);
-      pdf.roundedRect(bx, by, boxW, boxH, 2, 2, "FD");
+      pdf.roundedRect(bx,by,92,12,2,2,"FD");
 
       pdf.setTextColor(0,0,0);
       pdf.setFont("helvetica","bold");
       pdf.setFontSize(8.5);
-      pdf.text(info[0] + ":", bx + 4, by + 7.8);
+      pdf.text(info[0] + ":",bx + 4,by + 7.8);
 
       pdf.setFont("helvetica","normal");
-      pdf.text(String(info[1]).slice(0, 42), bx + 28, by + 7.8);
+      pdf.text(safeText(info[1]).slice(0,42),bx + 28,by + 7.8);
     });
 
-    // ASSINATURAS
+    // Assinaturas
     pdf.setDrawColor(20,20,20);
     pdf.setLineWidth(0.45);
-    pdf.line(58, 186, 125, 186);
-    pdf.line(174, 186, 241, 186);
+    pdf.line(58,186,125,186);
+    pdf.line(174,186,241,186);
 
-    if(p.assinatura){
+    if(participante.assinatura){
       try{
-        pdf.addImage(p.assinatura, "PNG", 188, 169, 40, 13);
+        pdf.addImage(participante.assinatura,"PNG",188,169,40,13);
       }catch(e){}
     }
 
     pdf.setTextColor(55,65,81);
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(8.5);
-    pdf.text("Responsável / Instrutor", 91.5, 193, { align: "center" });
-    pdf.text("Assinatura do Participante", 207.5, 193, { align: "center" });
+    pdf.text("Responsável / Instrutor",91.5,193,{align:"center"});
+    pdf.text("Assinatura do Participante",207.5,193,{align:"center"});
 
-    // RODAPÉ
+    // Rodapé
     pdf.setTextColor(100,100,100);
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(8);
-    pdf.text("Inno Life Nutrition • Transformando conhecimento em qualidade de vida.", 148.5, 199, { align: "center" });
+    pdf.text("Inno Life Nutrition • Transformando conhecimento em qualidade de vida.",148.5,199,{align:"center"});
   }
 
   pdf.save("certificados-treinerlife.pdf");
@@ -365,7 +355,7 @@ return <div className="app">
 <section className="panel"><div className="top"><div><h2>Apresentações</h2><p>{shown.length} resultado(s)</p></div><div className="filters"><div className="search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar..."/></div><select value={filter} onChange={e=>setFilter(e.target.value)}><option value="todos">Todos</option><option value="aplicados">Aplicados</option><option value="nao">Não aplicados</option></select></div></div>
 <div className="table"><div className="thead"><span>Arquivo</span><span>Status</span><span>Data</span><span>Responsável</span><span>Observação</span><span>Ações</span></div>{shown.map(i=><div className="row" key={i.id}><div className="file"><div className="thumb">{kind(i.nome)}</div><div><b>{i.nome}</b><small>{mb(i.tamanho)}</small></div></div><button className={i.aplicado?"st ok":"st pend"} onClick={()=>mark(i,!i.aplicado)}>{i.aplicado?"Aplicado":"Não aplicado"}</button><input type="date" value={i.data_aplicacao||""} onChange={e=>upd(i,"data_aplicacao",e.target.value)}/><input value={i.responsavel||""} onChange={e=>upd(i,"responsavel",e.target.value)} placeholder="Responsável"/><textarea value={i.observacao||""} onChange={e=>upd(i,"observacao",e.target.value)} placeholder="Observações"/><div className="actions"><button title="Abrir no app" onClick={()=>setPreview(i)}><Eye/></button><button className="cert" title="Certificados" onClick={()=>openCert(i)}><Award/></button><a href={i.url} target="_blank"><Download/></a><button className="danger" onClick={()=>del(i)}><Trash2/></button></div></div>)}</div></section></main>
 {preview&&<div className="modal" onClick={()=>setPreview(null)}><div className="viewer" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setPreview(null)}><X/></button><div className="viewerTop"><div><h2>{preview.nome}</h2><p>Preview via Office Online Viewer. O arquivo precisa estar público no Supabase.</p></div><a className="primary" href={preview.url} target="_blank"><Download/>Baixar</a></div><iframe src={office(preview.url)} title="PPT Preview"></iframe></div></div>}
-{cert&&<div className="modal certModal" onClick={()=>setCert(null)}><div className="certWrap" onClick={e=>e.stopPropagation()}><button className="close noPrint" onClick={()=>setCert(null)}><X/></button><div className="certForm noPrint"><h2><Award/> Certificados em lote</h2><p>Importe a lista de presença em PDF. O app tenta ler os nomes e recortar as assinaturas. Revise antes de baixar PDF.</p><div className="grid"><label>Nome do curso<input value={form.curso} onChange={e=>setForm({...form,curso:e.target.value})}/></label><label>Instrutor<input value={form.instrutor} onChange={e=>setForm({...form,instrutor:e.target.value})}/></label><label>Data<input type="date" value={form.data} onChange={e=>setForm({...form,data:e.target.value})}/></label><label>Carga horária<input value={form.carga} onChange={e=>setForm({...form,carga:e.target.value})}/></label><label>Local<input value={form.local} onChange={e=>setForm({...form,local:e.target.value})}/></label><label>Observações<input value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})}/></label></div><div className="certTools"><button className="secondary" onClick={()=>pdfInput.current.click()} disabled={importing}><FileSignature/> {importing?"Importando...":"Importar lista PDF"}</button><button className="secondary" onClick={addP}><Plus/> Adicionar participante</button><button className="primary" onClick={()=>setTimeout(()=>window.print(),300)}><Printer/> Baixar / baixar PDF todos</button><input ref={pdfInput} hidden type="file" accept=".pdf,application/pdf" onChange={e=>importPdf(e.target.files?.[0])}/></div><div className="participants">{form.participantes.map((p,idx)=><div className="pline" key={idx}><span>{String(idx+1).padStart(2,"0")}</span><input value={p.nome} onChange={e=>upP(idx,"nome",e.target.value)} placeholder="Nome"/>{p.assinatura?<img src={p.assinatura}/>:<em>sem assinatura</em>}<button onClick={()=>rmP(idx)}><Trash2/></button></div>)}</div></div><div className="certPages">{certParts.map((p,idx)=><section className="certificate" key={idx}><div className="certBorder"><img className="certLogo" src="/logo-inno-life.webp"/><div className="seal"><Award/></div><p className="certSmall">Certificado de Conclusão</p><h1>CERTIFICADO</h1><p>Certificamos que</p><h2>{p.nome||"Nome do Participante"}</h2><p>participou e concluiu o treinamento</p><h3>{form.curso||cert.nome}</h3><div className="certInfo"><span><b>Data:</b> {br(form.data)}</span><span><b>Carga horária:</b> {form.carga}</span><span><b>Instrutor:</b> {form.instrutor||cert.responsavel||"—"}</span><span><b>Local:</b> {form.local}</span></div>{form.obs&&<p className="obsCert">{form.obs}</p>}<div className="signs"><div><i></i><p>Responsável / Instrutor</p></div><div>{p.assinatura?<img src={p.assinatura}/>:<i></i>}<p>Assinatura do Participante</p></div></div><footer>Inno Life Nutrition • Transformando conhecimento em qualidade de vida.</footer></div></section>)}</div></div></div>}
+{cert&&<div className="modal certModal" onClick={()=>setCert(null)}><div className="certWrap" onClick={e=>e.stopPropagation()}><button className="close noPrint" onClick={()=>setCert(null)}><X/></button><div className="certForm noPrint"><h2><Award/> Certificados em lote</h2><p>Importe a lista de presença em PDF. O app tenta ler os nomes e recortar as assinaturas. Revise antes de baixar PDF.</p><div className="grid"><label>Nome do curso<input value={form.curso} onChange={e=>setForm({...form,curso:e.target.value})}/></label><label>Instrutor<input value={form.instrutor} onChange={e=>setForm({...form,instrutor:e.target.value})}/></label><label>Data<input type="date" value={form.data} onChange={e=>setForm({...form,data:e.target.value})}/></label><label>Carga horária<input value={form.carga} onChange={e=>setForm({...form,carga:e.target.value})}/></label><label>Local<input value={form.local} onChange={e=>setForm({...form,local:e.target.value})}/></label><label>Observações<input value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})}/></label></div><div className="certTools"><button className="secondary" onClick={()=>pdfInput.current.click()} disabled={importing}><FileSignature/> {importing?"Importando...":"Importar lista PDF"}</button><button className="secondary" onClick={addP}><Plus/> Adicionar participante</button><button className="primary" onClick={()=>setTimeout(()=>alert("Use o botão Baixar PDF. A impressão do navegador foi removida."),300)}><Printer/> Baixar / baixar PDF todos</button><input ref={pdfInput} hidden type="file" accept=".pdf,application/pdf" onChange={e=>importPdf(e.target.files?.[0])}/></div><div className="participants">{form.participantes.map((p,idx)=><div className="pline" key={idx}><span>{String(idx+1).padStart(2,"0")}</span><input value={p.nome} onChange={e=>upP(idx,"nome",e.target.value)} placeholder="Nome"/>{p.assinatura?<img src={p.assinatura}/>:<em>sem assinatura</em>}<button onClick={()=>rmP(idx)}><Trash2/></button></div>)}</div></div><div className="certPages">{certParts.map((p,idx)=><section className="certificate" key={idx}><div className="certBorder"><img className="certLogo" src="/logo-inno-life.webp"/><div className="seal"><Award/></div><p className="certSmall">Certificado de Conclusão</p><h1>CERTIFICADO</h1><p>Certificamos que</p><h2>{p.nome||"Nome do Participante"}</h2><p>participou e concluiu o treinamento</p><h3>{form.curso||cert.nome}</h3><div className="certInfo"><span><b>Data:</b> {br(form.data)}</span><span><b>Carga horária:</b> {form.carga}</span><span><b>Instrutor:</b> {form.instrutor||cert.responsavel||"—"}</span><span><b>Local:</b> {form.local}</span></div>{form.obs&&<p className="obsCert">{form.obs}</p>}<div className="signs"><div><i></i><p>Responsável / Instrutor</p></div><div>{p.assinatura?<img src={p.assinatura}/>:<i></i>}<p>Assinatura do Participante</p></div></div><footer>Inno Life Nutrition • Transformando conhecimento em qualidade de vida.</footer></div></section>)}</div></div></div>}
 </div>
 }
 createRoot(document.getElementById("root")).render(<App/>);
