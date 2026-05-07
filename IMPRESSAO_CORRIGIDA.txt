@@ -1,0 +1,18 @@
+CONFIGURAÇÃO AO IMPRIMIR:
+
+Destino:
+-> Salvar como PDF
+
+Layout:
+-> Paisagem
+
+Margens:
+-> Nenhuma
+
+Escala:
+-> Padrão (100%)
+
+Tamanho:
+-> A4
+
+Agora cada certificado sai em UMA folha inteira A4.
