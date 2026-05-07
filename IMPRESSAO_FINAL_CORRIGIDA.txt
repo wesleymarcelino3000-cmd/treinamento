@@ -1,0 +1,13 @@
+IMPRESSÃO FINAL CORRIGIDA
+
+Agora o botão "Baixar / imprimir todos" NÃO imprime mais a tela do app.
+Ele abre uma janela limpa somente com os certificados.
+
+Configuração recomendada:
+- Destino: Salvar como PDF
+- Papel: A4
+- Layout: Paisagem
+- Margens: Nenhuma
+- Escala: 100%
+
+Cada certificado fica em uma página A4 separada.
